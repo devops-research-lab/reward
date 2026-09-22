@@ -1,48 +1,29 @@
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow
----
-name: "Reward Release"
+name: Reward Release
 on:
-  push:
-    tags:
-      - 'v*'
-      - '!v*-beta*'
+  push: null
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: 1.24
-      - name: Download deps
-        run: go mod download -x
-      - name: Test
-        run: go test -race -v ./...
-
-  release:
-    name: "Release"
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up nix
-        uses: cachix/install-nix-action@v31
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: 1.24
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          version: latest
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REWARD_CI_TOKEN: ${{ secrets.REWARD_CI_TOKEN }}
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: 1.24
+    - name: Download deps
+      run: go mod download -x
+    - name: Test
+      run: go test -race -v ./...
+    - name: Set up nix
+      uses: cachix/install-nix-action@v30
+    - name: Run GoReleaser
+      uses: goreleaser/goreleaser-action@v6
+      with:
+        version: latest
+        args: release --clean
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REWARD_CI_TOKEN: ${{ secrets.REWARD_CI_TOKEN }}
